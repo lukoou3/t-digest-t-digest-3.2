@@ -42,8 +42,8 @@ import java.util.List;
  * - easy to adapt for use with map-reduce
  */
 public abstract class TDigest implements Serializable {
-    double min = Double.POSITIVE_INFINITY;
-    double max = Double.NEGATIVE_INFINITY;
+    double min = Double.POSITIVE_INFINITY; // 最小值
+    double max = Double.NEGATIVE_INFINITY; // 最大值
 
     /**
      * Creates an {@link MergingDigest}.  This is generally the best known implementation right now.
@@ -83,6 +83,7 @@ public abstract class TDigest implements Serializable {
     }
 
     /**
+     * 添加一个值到histogram, 可以设置权重
      * Adds a sample to a histogram.
      *
      * @param x The value to add.
@@ -182,6 +183,7 @@ public abstract class TDigest implements Serializable {
     public abstract void asSmallBytes(ByteBuffer buf);
 
     /**
+     * 告诉此TDigest尽可能多地记录原始数据以进行测试。
      * Tell this TDigest to record the original data as much as possible for test
      * purposes.
      *

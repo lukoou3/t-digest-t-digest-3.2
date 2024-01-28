@@ -82,20 +82,23 @@ public class AVLTreeDigest extends AbstractTDigest {
 
     public void add(double x, int w, List<Double> data) {
         checkValue(x);
+        // 更新最大最小值
         if (x < min) {
             min = x;
         }
         if (x > max) {
             max = x;
         }
+        // 寻找插入位置
         int start = summary.floor(x);
         if (start == IntAVLTree.NIL) {
             start = summary.first();
         }
 
         if (start == IntAVLTree.NIL) { // empty summary
+            // 第一次添加
             assert summary.size() == 0;
-            summary.add(x, w, data);
+            summary.add(x, w, data); // 添加到summary
             count = w;
         } else {
             double minDistance = Double.MAX_VALUE;
@@ -106,6 +109,7 @@ public class AVLTreeDigest extends AbstractTDigest {
                     start = neighbor;
                     minDistance = z;
                 } else if (z > minDistance) {
+                    // 最近的，中心比当前添加的大
                     // as soon as z increases, we have passed the nearest neighbor and can quit
                     lastNeighbor = neighbor;
                     break;
@@ -120,6 +124,7 @@ public class AVLTreeDigest extends AbstractTDigest {
                 double q = count == 1 ? 0.5 : (sum + (summary.count(neighbor) - 1) / 2.0) / (count - 1);
                 double k = 4 * count * q * (1 - q) / compression;
 
+                // 这种稍微巧妙的选择方法通过大量重复点来提高准确性
                 // this slightly clever selection method improves accuracy with lots of repeated points
                 if (summary.count(neighbor) + w <= k) {
                     n++;
@@ -133,6 +138,8 @@ public class AVLTreeDigest extends AbstractTDigest {
             if (closest == IntAVLTree.NIL) {
                 summary.add(x, w, data);
             } else {
+                //如果最近的点不是唯一的，那么我们可能不会修改第一个副本
+                //这意味着排序可能会发生变化
                 // if the nearest point was not unique, then we may not be modifying the first copy
                 // which means that ordering can change
                 double centroid = summary.mean(closest);
@@ -145,6 +152,7 @@ public class AVLTreeDigest extends AbstractTDigest {
                         d.addAll(data);
                     }
                 }
+                // 添加数据后计算更新质心
                 centroid = weightedAverage(centroid, count, x, w);
                 count += w;
                 summary.update(closest, centroid, count, d);
@@ -152,6 +160,7 @@ public class AVLTreeDigest extends AbstractTDigest {
             count += w;
 
             if (summary.size() > 20 * compression) {
+                // 可能发生在连续点的情况下
                 // may happen in case of sequential points
                 compress();
             }
@@ -175,6 +184,7 @@ public class AVLTreeDigest extends AbstractTDigest {
         }
         assert centroids.next(nodes[nodes.length - 1]) == IntAVLTree.NIL;
 
+        // 打乱，否则会一直需要compress
         for (int i = centroids.size() - 1; i > 0; --i) {
             final int other = gen.nextInt(i + 1);
             final int tmp = nodes[other];

@@ -177,11 +177,13 @@ final class AVLGroupTree extends AbstractCollection<Centroid> implements Seriali
     }
 
     /**
+     * 返回最后一个节点它的质心小于centroid。就是找到刚好大于其质心的节点，就是离得比较近的。
      * Return the last node whose centroid is less than <code>centroid</code>.
      */
     @SuppressWarnings("WeakerAccess")
     public int floor(double centroid) {
         int floor = IntAVLTree.NIL;
+        // 迭代tree
         for (int node = tree.root(); node != IntAVLTree.NIL; ) {
             final int cmp = Double.compare(centroid, mean(node));
             if (cmp <= 0) {
