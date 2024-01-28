@@ -1,0 +1,37 @@
+*.class
+target/
+.Rhistory
+docs/r-sim-diagrams/*.pdf
+histo.synctex.gz
+log
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# IDEA related files 
+.idea/
+*.iml
+
+# Eclipse related files
+.classpath
+.project
+.settings/
+
+# Latex and R related files
+_region_.prv/
+_region_*
+*.log
+*.aux
+*.blg
+*.bbl
+*.synctex.gz
+Rplots.pdf
+.Rhistory
+*.ini
+
+# diagnostic outputs
+*.csv
+*.tsv
+
