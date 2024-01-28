@@ -26,6 +26,18 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * 通过在缓冲区中收集新点来维护t-digest，然后偶尔对缓冲区进行排序，并将其合并到包含先前计算的质心的排序数组中。
+ * 这可能非常快，因为排序和合并的成本会在多次插入中摊销。如果我们总共保持N个质心，并且输入数组为k长，那么摊余成本类似于N/k+log k
+ * 当N/k=log k时，这些成本甚至会抵消。平衡成本通常是优化算法的好方法。对于不同的压缩因子值，下表显示了N的估计渐近值和k的建议值：
+ *
+ * 这种t-摘要实现的优点包括：
+ * 初始化后不需要分配
+ * 数据结构会在可能的情况下自动压缩现有质心
+ * 由于数据保存在基元数组中，因此质心不会产生Java对象开销
+ *
+ * 当前的实现方式自由地使用乒乓缓冲区来实现合并，这导致了相当大的内存损失，但原位合并的复杂性被认为是不值得的，
+ * 因为即使有开销，每个质心的内存成本也小于40字节，这远小于AVLTreeDigest使用的一半。速度测试仍然没有完成，因此不确定合并策略是否比树策略更快。
+ *
  * Maintains a t-digest by collecting new points in a buffer that is then sorted occasionally and merged
  * into a sorted array that contains previously computed centroids.
  * <p/>
@@ -64,6 +76,7 @@ import java.util.List;
 public class MergingDigest extends AbstractTDigest {
     private final double compression;
 
+    // 指向第一个未使用的质心
     // points to the first unused centroid
     private int lastUsedCell;
 
@@ -198,6 +211,7 @@ public class MergingDigest extends AbstractTDigest {
         if (Double.isNaN(x)) {
             throw new IllegalArgumentException("Cannot add NaN to t-digest");
         }
+        // 先写入缓冲，满了就合并
         if (tempUsed >= tempWeight.length - lastUsedCell - 1) {
             mergeNewValues();
         }
