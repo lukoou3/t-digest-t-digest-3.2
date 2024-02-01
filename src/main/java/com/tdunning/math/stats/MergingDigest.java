@@ -333,7 +333,7 @@ public class MergingDigest extends AbstractTDigest {
         double normalizer = compression / (Math.PI * totalWeight);
 
         assert incomingCount > 0;
-        lastUsedCell = 0;
+        lastUsedCell = 0; // 在这里重置为0重新计算了，他是怎么保证lastUsedCell不越界的?应该下面的公式的效果吧
         mean[lastUsedCell] = incomingMean[incomingOrder[0]];
         weight[lastUsedCell] = incomingWeight[incomingOrder[0]];
         double wSoFar = 0;

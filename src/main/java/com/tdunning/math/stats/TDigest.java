@@ -201,6 +201,7 @@ public abstract class TDigest implements Serializable {
     public abstract void add(double x);
 
     /**
+     * 合并的方法
      * Add all of the centroids of another TDigest to this one.
      *
      * @param other The other TDigest
